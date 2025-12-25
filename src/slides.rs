@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
+use uuid::Uuid;
 
 /// T: The linked entity (Song, BibleVerse, etc.)
 /// M: The media type (SongFile, PathBuf, etc.)
@@ -24,9 +25,20 @@ pub enum LinkedEntity<T, M> {
     Media(M),
 }
 
+/// A slide is a struct which represents content for a single slide in a presentation.
+/// Every slide has a unique identifier (UUID v7) and can contain various types of content.
+/// The UUID is generated when the slide is created and can be used to uniquely identify the slide in a presentation.
 #[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
 pub struct Slide<M> {
+    /// The unique identifier of the slide (UUID v7)
+    /// It will be generated when the slide is created and can be used to uniquely identify the slide in a presentation.
+    /// It is not meant to be modified after creation, therefore the field is private.
+    uuid: Uuid,
+
+    /// The content of the slide
     pub slide_content: SlideContent,
+
+    /// The optional linked file of the slide
     pub linked_file: Option<M>,
 }
 
@@ -50,6 +62,7 @@ where
 {
     pub fn new_empty_slide(black_background: bool) -> Self {
         Self {
+            uuid: Uuid::now_v7(),
             slide_content: SlideContent::Empty(EmptySlide { black_background }),
             linked_file: None,
         }
@@ -61,6 +74,7 @@ where
         meta_text: Option<String>,
     ) -> Self {
         Self {
+            uuid: Uuid::now_v7(),
             slide_content: SlideContent::SingleLanguageMainContent(
                 SingleLanguageMainContentSlide::new(
                     main_text.trim().to_string(),
@@ -74,6 +88,7 @@ where
 
     pub fn new_title_slide(title_text: String, meta_text: Option<String>) -> Self {
         Self {
+            uuid: Uuid::now_v7(),
             slide_content: SlideContent::Title(TitleSlide {
                 title_text: title_text.trim().to_string(),
                 meta_text: meta_text.map(|s| s.trim().to_string()),
@@ -102,6 +117,11 @@ where
             SlideContent::MultiLanguageMainContent(s) => s.meta_text.is_some(),
             _ => false,
         }
+    }
+
+    /// Returns the UUID of the slide (UUID v7)
+    pub fn uuid(&self) -> Uuid {
+        self.uuid
     }
 }
 
