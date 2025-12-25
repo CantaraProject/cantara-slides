@@ -2,11 +2,18 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use uuid::Uuid;
 
+/// A Presentation Chapter represents a logical grouping of slides within a presentation.
+/// It is used to organize the content into sections or chapters.
+///
+/// # Generic Parameters
 /// T: The linked entity (Song, BibleVerse, etc.)
 /// M: The media type (SongFile, PathBuf, etc.)
 #[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
 pub struct PresentationChapter<T, M> {
+    /// The slides within this chapter.
     pub slides: Vec<Slide<M>>,
+
+    /// The linked entity of the chapter, most likely connected to content where it is derived from.
     pub linked_entity: LinkedEntity<T, M>,
 }
 
